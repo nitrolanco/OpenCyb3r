@@ -23,14 +23,16 @@ OpenCyb3r is a collaborative platform where contributors of all skill levels can
 
 
 
+
 <!-- LEADERBOARD START -->
 | Rank | Contributor | Contributions |
 |------|-------------|----------------|
 | 1 | <img src='https://avatars.githubusercontent.com/u/31905836?v=4' width='20' height='20'> akmalel | 55 |
-| 2 | <img src='https://avatars.githubusercontent.com/in/15368?v=4' width='20' height='20'> github-actions[bot] | 16 |
+| 2 | <img src='https://avatars.githubusercontent.com/in/15368?v=4' width='20' height='20'> github-actions[bot] | 18 |
 | 3 | <img src='https://avatars.githubusercontent.com/u/36962977?v=4' width='20' height='20'> evanlutz725 | 4 |
 
 <!-- LEADERBOARD END -->
+
 
 
 
