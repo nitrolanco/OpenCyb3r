@@ -1,14 +1,12 @@
 import requests
-import json
-import argparse
-import re
 import os
-import subprocess
-
 
 def get_contributors(owner, repo):
     url = f"https://api.github.com/repos/{owner}/{repo}/contributors"
-    response = requests.get(url)
+    headers = {
+        "Authorization": f"token {os.getenv('GITHUB_TOKEN')}"
+    }  # Use GitHub token for authentication
+    response = requests.get(url, headers=headers)
 
     if response.status_code == 200:
         contributors = response.json()
@@ -21,27 +19,10 @@ def get_contributors(owner, repo):
                 "avatar_url": contributor["avatar_url"]
             })
 
-        # Ensure the repo owner is included in the leaderboard
-        repo_info_url = f"https://api.github.com/repos/{owner}/{repo}"
-        repo_info_response = requests.get(repo_info_url)
-        if repo_info_response.status_code == 200:
-            repo_info = repo_info_response.json()
-            owner_username = repo_info["owner"]["login"]
-            owner_avatar_url = repo_info["owner"]["avatar_url"]
-
-            # Check if the owner is already in the contributors list
-            if not any(c["username"] == owner_username for c in leaderboard):
-                leaderboard.append({
-                    "username": owner_username,
-                    "contributions": 0,  # Default to 0 contributions if not listed
-                    "avatar_url": owner_avatar_url
-                })
-
         return sorted(leaderboard, key=lambda x: x["contributions"], reverse=True)
     else:
-        print(f"Failed to fetch contributors: {response.status_code}")
+        print(f"Failed to fetch contributors: {response.status_code}, {response.text}")
         return []
-
 
 def generate_html(leaderboard, owner, repo):
     html = f"""
@@ -97,7 +78,7 @@ def generate_html(leaderboard, owner, repo):
         </style>
     </head>
     <body>
-        <h1>OpenCyb3r Leaderboard</h1>
+        <h1>{repo} Leaderboard</h1>
         <table>
             <thead>
                 <tr>
@@ -124,35 +105,9 @@ def generate_html(leaderboard, owner, repo):
     """
     return html
 
-
 def save_html_to_file(html, filename="leaderboard.html"):
     with open(filename, "w") as file:
         file.write(html)
-
-
-def push_to_github_pages(repo_url, file_path):
-    """Push the leaderboard HTML to the GitHub Pages repository."""
-    temp_dir = "temp_repo"
-    try:
-        # Clone the GitHub Pages repository
-        subprocess.run(["git", "clone", repo_url, temp_dir], check=True)
-
-        # Copy the leaderboard file to the repository
-        destination = os.path.join(temp_dir, os.path.basename(file_path))
-        os.replace(file_path, destination)
-
-        # Commit and push changes
-        os.chdir(temp_dir)
-        subprocess.run(["git", "add", os.path.basename(file_path)], check=True)
-        subprocess.run(["git", "commit", "-m", "Update leaderboard.html"], check=True)
-        subprocess.run(["git", "push"], check=True)
-        print(f"Leaderboard pushed to {repo_url} successfully.")
-    except subprocess.CalledProcessError as e:
-        print(f"Failed to push leaderboard to GitHub Pages: {e}")
-    finally:
-        os.chdir("..")
-        subprocess.run(["rm", "-rf", temp_dir])
-
 
 def update_readme(leaderboard, repo):
     top_5 = leaderboard[:5]
@@ -162,51 +117,39 @@ def update_readme(leaderboard, repo):
     for rank, contributor in enumerate(top_5, start=1):
         markdown += (
             f"| {rank} | "
-            f"<img src='{contributor['avatar_url']}' alt='{contributor['username']}' width='20' height='20'> "
+            f"<img src='{contributor['avatar_url']}' alt='{contributor['username']}' width='40'> "
             f"{contributor['username']} | {contributor['contributions']} |\n"
         )
 
-    start_marker = "<!-- LEADERBOARD START -->"
-    end_marker = "<!-- LEADERBOARD END -->"
-    leaderboard_section = f"{start_marker}\n{markdown}\n{end_marker}"
-
     try:
         with open("README.md", "r") as file:
-            content = file.read()
-
-        # Replace or append the leaderboard section
-        if start_marker in content and end_marker in content:
-            # Replace the content between the markers
-            updated_content = re.sub(
-                f"{start_marker}.*?{end_marker}",
-                leaderboard_section,
-                content,
-                flags=re.DOTALL,
-            )
-        else:
-            # Add markers and leaderboard if missing
-            updated_content = f"{content.strip()}\n\n{leaderboard_section}\n"
+            content = file.readlines()
 
         with open("README.md", "w") as file:
-            file.write(updated_content)
+            updated = False
+            for line in content:
+                if line.strip() == "<!-- LEADERBOARD START -->":
+                    file.write("<!-- LEADERBOARD START -->\n")
+                    file.write(markdown)
+                    file.write("\n<!-- LEADERBOARD END -->\n")
+                    updated = True
+                elif not (line.strip() == "<!-- LEADERBOARD END -->"):
+                    file.write(line)
+
+            if not updated:
+                file.write("\n<!-- LEADERBOARD START -->\n")
+                file.write(markdown)
+                file.write("\n<!-- LEADERBOARD END -->\n")
 
         print("README.md updated successfully with the Top 5 leaderboard.")
     except FileNotFoundError:
         print("README.md not found. Creating a new one.")
         with open("README.md", "w") as file:
-            file.write(leaderboard_section)
-
+            file.write(markdown)
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description='Update leaderboard.')
-    parser.add_argument('--owner', required=True, help='The GitHub repository owner')
-    parser.add_argument('--repo', required=True, help='The GitHub repository name')
-    parser.add_argument('--pages-repo', required=True, help='The GitHub Pages repository URL')
-    args = parser.parse_args()
-
-    owner = args.owner
-    repo = args.repo
-    pages_repo = args.pages_repo
+    owner = input("Enter the GitHub repository owner: ")
+    repo = input("Enter the GitHub repository name: ")
 
     print("Generating GitHub repository leaderboard...")
 
@@ -215,7 +158,6 @@ if __name__ == "__main__":
     if leaderboard:
         html = generate_html(leaderboard, owner, repo)
         save_html_to_file(html)
-        push_to_github_pages(pages_repo, "leaderboard.html")
         update_readme(leaderboard, repo)
         print("Leaderboard HTML and README updated successfully.")
     else:
