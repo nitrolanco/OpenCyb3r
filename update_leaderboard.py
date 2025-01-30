@@ -1,5 +1,6 @@
 import requests
 import os
+import re
 
 # Use GitHub Secrets for repo details
 OWNER = os.getenv("REPO_OWNER")
@@ -9,7 +10,7 @@ def get_contributors(owner, repo):
     """Fetch contributors from GitHub API."""
     url = f"https://api.github.com/repos/{owner}/{repo}/contributors"
     headers = {"Accept": "application/vnd.github.v3+json"}
-    
+
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
         contributors = response.json()
@@ -98,22 +99,46 @@ def save_html_to_file(html, filename="leaderboard.html"):
         file.write(html)
 
 def update_readme(leaderboard):
-    """Update README.md with the Top 5 contributors."""
+    """Update README.md with the Top 5 contributors while preserving other content."""
     top_5 = leaderboard[:5]
-    markdown = f"# {REPO} Top 5 Contributors\n\n"
-    markdown += "| Rank | Contributor | Contributions |\n"
-    markdown += "|------|-------------|----------------|\n"
+    leaderboard_section = f"\n<!-- LEADERBOARD START -->\n"
+    leaderboard_section += "| Rank | Contributor | Contributions |\n"
+    leaderboard_section += "|------|-------------|----------------|\n"
+
     for rank, contributor in enumerate(top_5, start=1):
-        markdown += (
+        leaderboard_section += (
             f"| {rank} | <img src='{contributor['avatar_url']}' width='20' height='20'> {contributor['username']} | {contributor['contributions']} |\n"
         )
+    leaderboard_section += "\n<!-- LEADERBOARD END -->\n"
 
-    with open("README.md", "w") as file:
-        file.write(markdown)
+    try:
+        with open("README.md", "r") as file:
+            content = file.read()
+
+        # Preserve content outside leaderboard section
+        if "<!-- LEADERBOARD START -->" in content and "<!-- LEADERBOARD END -->" in content:
+            updated_content = re.sub(
+                r"<!-- LEADERBOARD START -->.*?<!-- LEADERBOARD END -->",
+                leaderboard_section,
+                content,
+                flags=re.DOTALL
+            )
+        else:
+            updated_content = content.strip() + "\n\n" + leaderboard_section
+
+        with open("README.md", "w") as file:
+            file.write(updated_content)
+
+        print("✅ README.md updated successfully.")
+    except FileNotFoundError:
+        print("⚠️ README.md not found, creating a new one.")
+        with open("README.md", "w") as file:
+            file.write(leaderboard_section)
 
 if __name__ == "__main__":
     print(f"Generating leaderboard for {OWNER}/{REPO}...")
     leaderboard = get_contributors(OWNER, REPO)
+
     if leaderboard:
         save_html_to_file(generate_html(leaderboard))
         update_readme(leaderboard)
