@@ -1,12 +1,14 @@
 import requests
-import os
+import json
+
+# Hardcoded repository details
+OWNER = "akmalel"
+REPO = "OpenCyb3r"
 
 def get_contributors(owner, repo):
+    """Fetch contributors from the GitHub API."""
     url = f"https://api.github.com/repos/{owner}/{repo}/contributors"
-    headers = {
-        "Authorization": f"token {os.getenv('GITHUB_TOKEN')}"
-    }  # Use GitHub token for authentication
-    response = requests.get(url, headers=headers)
+    response = requests.get(url)
 
     if response.status_code == 200:
         contributors = response.json()
@@ -21,17 +23,18 @@ def get_contributors(owner, repo):
 
         return sorted(leaderboard, key=lambda x: x["contributions"], reverse=True)
     else:
-        print(f"Failed to fetch contributors: {response.status_code}, {response.text}")
+        print(f"Failed to fetch contributors: {response.status_code}")
         return []
 
 def generate_html(leaderboard, owner, repo):
+    """Generate the full leaderboard as an HTML file."""
     html = f"""
     <!DOCTYPE html>
     <html>
     <head>
         <title>{repo} Leaderboard</title>
         <style>
-            body {{ 
+            body {{
                 background: linear-gradient(0deg, #1b2838, #1e3a4c, #1f4c60, #16202b);
                 background-size: 300% 300%;
                 animation: gradient 30s ease infinite;
@@ -47,15 +50,9 @@ def generate_html(leaderboard, owner, repo):
             }}
 
             @keyframes gradient {{
-                0% {{
-                    background-position: 50% 0%;
-                }}
-                50% {{
-                    background-position: 50% 100%;
-                }}
-                100% {{
-                    background-position: 50% 0%;
-                }}
+                0% {{ background-position: 50% 0%; }}
+                50% {{ background-position: 50% 100%; }}
+                100% {{ background-position: 50% 0%; }}
             }}
 
             table {{ border-collapse: collapse; width: 80%; margin-top: 20px; z-index: 1; position: relative; }}
@@ -106,10 +103,12 @@ def generate_html(leaderboard, owner, repo):
     return html
 
 def save_html_to_file(html, filename="leaderboard.html"):
+    """Save the leaderboard HTML to a file."""
     with open(filename, "w") as file:
         file.write(html)
 
 def update_readme(leaderboard, repo):
+    """Update the README.md file with the new Top 5 leaderboard."""
     top_5 = leaderboard[:5]
     markdown = f"# {repo} Top 5 Contributors\n\n"
     markdown += "| Rank | Contributor | Contributions |\n"
@@ -117,7 +116,7 @@ def update_readme(leaderboard, repo):
     for rank, contributor in enumerate(top_5, start=1):
         markdown += (
             f"| {rank} | "
-            f"<img src='{contributor['avatar_url']}' alt='{contributor['username']}' width='40'> "
+            f"<img src='{contributor['avatar_url']}' alt='{contributor['username']}' width='20' height='20'> "
             f"{contributor['username']} | {contributor['contributions']} |\n"
         )
 
@@ -148,17 +147,14 @@ def update_readme(leaderboard, repo):
             file.write(markdown)
 
 if __name__ == "__main__":
-    owner = input("Enter the GitHub repository owner: ")
-    repo = input("Enter the GitHub repository name: ")
+    print(f"Generating leaderboard for {OWNER}/{REPO}...")
 
-    print("Generating GitHub repository leaderboard...")
-
-    leaderboard = get_contributors(owner, repo)
+    leaderboard = get_contributors(OWNER, REPO)
 
     if leaderboard:
-        html = generate_html(leaderboard, owner, repo)
+        html = generate_html(leaderboard, OWNER, REPO)
         save_html_to_file(html)
-        update_readme(leaderboard, repo)
+        update_readme(leaderboard, REPO)
         print("Leaderboard HTML and README updated successfully.")
     else:
         print("No contributors found or failed to retrieve data.")
