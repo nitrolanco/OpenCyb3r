@@ -25,11 +25,16 @@ jobs:
         run: |
           python update_leaderboard.py
         env:
-          REPO_OWNER: ${{ github.repository_owner }}
-          REPO_NAME: ${{ github.event.repository.name }}
-          LEADERBOARD_SECRET: ${{ secrets.LEADERBOARD_SECRET }}
+          REPO_OWNER: ${{ secrets.REPO_OWNER }}
+          REPO_NAME: ${{ secrets.REPO_NAME }}
 
       - name: Commit and push updated leaderboard
         run: |
           git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add README.md leaderboard.html
+          if ! git diff --cached --quiet; then
+            git commit -m "Update leaderboard"
+            git push
+          else
+            echo "No changes to commit"
