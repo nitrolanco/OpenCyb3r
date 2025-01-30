@@ -24,6 +24,9 @@ jobs:
       - name: Fetch contributions and update leaderboard.html
         run: |
           python update_leaderboard.py
+        env:
+          REPO_OWNER: ${{ github.repository_owner }}
+          REPO_NAME: ${{ github.event.repository.name }}
 
       - name: Commit and push updated leaderboard
         run: |

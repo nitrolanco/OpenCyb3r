@@ -1,14 +1,18 @@
 import requests
-import json
+import os
 
-# Hardcoded repository details
-OWNER = "akmalel"
-REPO = "OpenCyb3r"
+# Dynamically fetch repository details from environment variables
+OWNER = os.getenv("REPO_OWNER", "default_owner")
+REPO = os.getenv("REPO_NAME", "default_repo")
 
 def get_contributors(owner, repo):
     """Fetch contributors from the GitHub API."""
     url = f"https://api.github.com/repos/{owner}/{repo}/contributors"
-    response = requests.get(url)
+    headers = {
+        "Accept": "application/vnd.github.v3+json"
+    }
+
+    response = requests.get(url, headers=headers)
 
     if response.status_code == 200:
         contributors = response.json()
@@ -23,7 +27,7 @@ def get_contributors(owner, repo):
 
         return sorted(leaderboard, key=lambda x: x["contributions"], reverse=True)
     else:
-        print(f"Failed to fetch contributors: {response.status_code}")
+        print(f"Failed to fetch contributors: {response.status_code}, {response.text}")
         return []
 
 def generate_html(leaderboard, owner, repo):
