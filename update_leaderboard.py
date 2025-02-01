@@ -44,6 +44,7 @@ def generate_html(leaderboard):
                 color: white;
                 margin: 0;
                 padding: 20px;
+                overflow: hidden;
             }}
 
             @keyframes gradient {{
@@ -52,23 +53,59 @@ def generate_html(leaderboard):
                 100% {{ background-position: 0% 50%; }}
             }}
 
+            h1 {{
+                font-size: 2.5rem;
+                font-weight: bold;
+                text-shadow: 0 0 10px #00ffea, 0 0 20px #00ffea, 0 0 30px #00ffea;
+            }}
+
             table {{
                 width: 80%;
                 margin: 20px auto;
                 border-collapse: collapse;
                 background: rgba(255, 255, 255, 0.1);
                 backdrop-filter: blur(10px);
+                border: 2px solid #00ffea;
+                box-shadow: 0 0 10px #00ffea;
             }}
+
             th, td {{
                 padding: 10px;
                 border: 1px solid white;
             }}
+
+            tr:hover {{
+                background-color: rgba(0, 255, 234, 0.2);
+                transition: 0.3s ease-in-out;
+            }}
+
             .avatar {{
                 width: 40px;
                 height: 40px;
                 border-radius: 50%;
                 margin-right: 10px;
                 vertical-align: middle;
+                border: 2px solid #00ffea;
+                box-shadow: 0 0 10px #00ffea;
+            }}
+
+            .particle {{
+                position: absolute;
+                width: 5px;
+                height: 5px;
+                background-color: rgba(0, 255, 234, 0.8);
+                border-radius: 50%;
+                opacity: 0.6;
+                animation: moveParticle 10s linear infinite;
+            }}
+
+            @keyframes moveParticle {{
+                from {{
+                    transform: translate(0, 0);
+                }}
+                to {{
+                    transform: translate(100vw, 100vh);
+                }}
             }}
         </style>
     </head>
@@ -84,6 +121,44 @@ def generate_html(leaderboard):
             </thead>
             <tbody>
     """.format(REPO)
+
+    for rank, contributor in enumerate(leaderboard, start=1):
+        html += """
+                <tr>
+                    <td>{}</td>
+                    <td><img src="{}" class="avatar"> {}</td>
+                    <td>{}</td>
+                </tr>
+        """.format(rank, contributor["avatar_url"], contributor["username"], contributor["contributions"])
+
+    html += """
+            </tbody>
+        </table>
+
+        <script>
+            function createParticle() {{
+                const particle = document.createElement("div");
+                particle.classList.add("particle");
+                document.body.appendChild(particle);
+
+                particle.style.left = Math.random() * 100 + "vw";
+                particle.style.top = Math.random() * 100 + "vh";
+                particle.style.animationDuration = Math.random() * 10 + 5 + "s";
+
+                setTimeout(() => {{
+                    particle.remove();
+                }}, 15000);
+            }}
+
+            setInterval(createParticle, 500);
+        </script>
+
+    </body>
+    </html>
+    """
+
+    return html
+
 
 
     for rank, contributor in enumerate(leaderboard, start=1):
