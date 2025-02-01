@@ -37,12 +37,21 @@ def generate_html(leaderboard):
         <style>
             body {{
                 background: linear-gradient(0deg, #1b2838, #1e3a4c, #1f4c60, #16202b);
-                color: white;
+                background-size: 300% 300%;
+                animation: gradient 30s ease infinite;
                 font-family: Arial, sans-serif;
                 text-align: center;
+                color: white;
                 margin: 0;
                 padding: 20px;
             }}
+
+            @keyframes gradient {{
+                0% {{ background-position: 50% 0%; }}
+                50% {{ background-position: 50% 100%; }}
+                100% {{ background-position: 50% 0%; }}
+            }}
+
             table {{
                 width: 80%;
                 margin: 20px auto;
@@ -75,6 +84,7 @@ def generate_html(leaderboard):
             </thead>
             <tbody>
     """.format(REPO)
+
 
     for rank, contributor in enumerate(leaderboard, start=1):
         html += """
