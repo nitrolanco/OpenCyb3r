@@ -33,7 +33,7 @@ def generate_html(leaderboard):
     <!DOCTYPE html>
     <html>
     <head>
-        <title>Leaderboard</title>
+        <title>OpenCyb3r Leaderboard</title>
         <style>
             body {{
                 background: linear-gradient(-45deg, #0a0f1b, #1a2a3a, #004466, #006666);
