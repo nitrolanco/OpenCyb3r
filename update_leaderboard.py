@@ -37,8 +37,8 @@ def generate_html(leaderboard):
         <style>
             body {{
                 background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
-                background-size: 300% 300%;
-                animation: gradient 30s ease infinite;
+                background-size: 400% 400%;
+                animation: gradient 15s ease infinite;
                 font-family: Arial, sans-serif;
                 text-align: center;
                 color: white;
@@ -47,9 +47,9 @@ def generate_html(leaderboard):
             }}
 
             @keyframes gradient {{
-                0% {{ background-position: 50% 0%; }}
-                50% {{ background-position: 50% 100%; }}
-                100% {{ background-position: 50% 0%; }}
+                0% {{ background-position: 0% 50%; }}
+                50% {{ background-position: 100% 50%; }}
+                100% {{ background-position: 0% 50%; }}
             }}
 
             table {{
