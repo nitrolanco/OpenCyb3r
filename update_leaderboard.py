@@ -28,7 +28,7 @@ def get_contributors(owner, repo):
         return []
 
 def generate_html(leaderboard):
-    """Generate leaderboard.html for GitHub Pages."""
+    """Generate leaderboard.html for GitHub Pages with a darker cyber theme."""
     html = """
     <!DOCTYPE html>
     <html>
@@ -36,7 +36,7 @@ def generate_html(leaderboard):
         <title>Leaderboard</title>
         <style>
             body {{
-                background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+                background: linear-gradient(-45deg, #0a0f1b, #1a2a3a, #004466, #006666);
                 background-size: 400% 400%;
                 animation: gradient 15s ease infinite;
                 font-family: Arial, sans-serif;
@@ -121,6 +121,44 @@ def generate_html(leaderboard):
             </thead>
             <tbody>
     """.format(REPO)
+
+    for rank, contributor in enumerate(leaderboard, start=1):
+        html += """
+                <tr>
+                    <td>{}</td>
+                    <td><img src="{}" class="avatar"> {}</td>
+                    <td>{}</td>
+                </tr>
+        """.format(rank, contributor["avatar_url"], contributor["username"], contributor["contributions"])
+
+    html += """
+            </tbody>
+        </table>
+
+        <script>
+            function createParticle() {{
+                const particle = document.createElement("div");
+                particle.classList.add("particle");
+                document.body.appendChild(particle);
+
+                particle.style.left = Math.random() * 100 + "vw";
+                particle.style.top = Math.random() * 100 + "vh";
+                particle.style.animationDuration = Math.random() * 10 + 5 + "s";
+
+                setTimeout(() => {{
+                    particle.remove();
+                }}, 15000);
+            }}
+
+            setInterval(createParticle, 500);
+        </script>
+
+    </body>
+    </html>
+    """
+
+    return html
+
 
     for rank, contributor in enumerate(leaderboard, start=1):
         html += """
