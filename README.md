@@ -88,6 +88,7 @@ OpenCyb3r is a collaborative platform where contributors of all skill levels can
 
 
 
+
 <!-- LEADERBOARD START -->
 | Rank | Contributor | Contributions |
 |------|-------------|----------------|
@@ -96,6 +97,7 @@ OpenCyb3r is a collaborative platform where contributors of all skill levels can
 | 3 | <img src='https://avatars.githubusercontent.com/in/15368?v=4' width='20' height='20'> github-actions[bot] | 10 |
 
 <!-- LEADERBOARD END -->
+
 
 
 
