@@ -110,7 +110,7 @@ def generate_html(leaderboard):
         </style>
     </head>
     <body>
-        <h1>Leaderboard for {}</h1>
+        <h1>OpenCyb3r Leaderboard</h1>
         <table>
             <thead>
                 <tr>
