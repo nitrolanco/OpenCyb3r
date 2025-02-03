@@ -6,33 +6,26 @@ import re
 OWNER = os.getenv("REPO_OWNER")
 REPO = os.getenv("REPO_NAME")
 
-def get_contributors(owner, repo, period="all"):
-    """Fetch contributors and filter by time period (all-time, weekly, monthly)."""
+def get_contributors(owner, repo):
+    """Fetch contributors from GitHub API."""
     url = f"https://api.github.com/repos/{owner}/{repo}/contributors"
     headers = {"Accept": "application/vnd.github.v3+json"}
 
     response = requests.get(url, headers=headers)
-    if response.status_code != 200:
+    if response.status_code == 200:
+        contributors = response.json()
+        leaderboard = [
+            {
+                "username": contributor["login"],
+                "contributions": contributor["contributions"],
+                "avatar_url": contributor["avatar_url"]
+            }
+            for contributor in contributors
+        ]
+        return sorted(leaderboard, key=lambda x: x["contributions"], reverse=True)
+    else:
         print(f"Failed to fetch contributors: {response.status_code}")
         return []
-
-    contributors = response.json()
-    leaderboard = []
-
-    for contributor in contributors:
-        username = contributor["login"]
-
-        # ✅ Skip GitHub Actions bot
-        if username.lower() == "github-actions[bot]":
-            continue  # Ignore this entry
-
-        leaderboard.append({
-            "username": username,
-            "contributions": contributor["contributions"],
-            "avatar_url": contributor["avatar_url"]
-        })
-
-    return sorted(leaderboard, key=lambda x: x["contributions"], reverse=True)
 
 def generate_html(leaderboard):
     """Generate leaderboard.html for GitHub Pages with a darker cyber theme."""
@@ -129,24 +122,18 @@ def generate_html(leaderboard):
             <tbody>
     """.format(REPO)
 
-for rank, contributor in enumerate(leaderboard, start=1):
+    for rank, contributor in enumerate(leaderboard, start=1):
+        html += """
+                <tr>
+                    <td>{}</td>
+                    <td><img src="{}" class="avatar"> {}</td>
+                    <td>{}</td>
+                </tr>
+        """.format(rank, contributor["avatar_url"], contributor["username"], contributor["contributions"])
+
     html += """
-        <tr>
-            <td>{}</td>
-            <td>
-                <a href="https://github.com/{}" target="_blank" style="color: #00ffea; text-decoration: none;">
-                    <img src="{}" class="avatar"> {}
-                </a>
-            </td>
-            <td>{}</td>
-        </tr>
-    """.format(rank, contributor["username"], contributor["avatar_url"], contributor["username"], contributor["contributions"])
-
-html += """
-        </tbody>
-    </table>
-"""
-
+            </tbody>
+        </table>
 
         <script>
             function createParticle() {{
