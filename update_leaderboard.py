@@ -147,6 +147,7 @@ html += """
     </table>
 """
 
+
         <script>
             function createParticle() {{
                 const particle = document.createElement("div");
