@@ -11,7 +11,9 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+        with:
+          persist-credentials: false  # Ensure correct authentication method
 
       - name: Set up Python
         uses: actions/setup-python@v4
@@ -28,10 +30,13 @@ jobs:
           REPO_OWNER: ${{ secrets.REPO_OWNER }}
           REPO_NAME: ${{ secrets.REPO_NAME }}
 
-      - name: Force commit leaderboard.html
+      - name: Configure Git
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Force commit leaderboard.html
+        run: |
           git add README.md leaderboard.html
-          git commit -m "Force update leaderboard" --allow-empty
-          git push
+          git diff --cached --exit-code || git commit -m "Force update leaderboard"
+          git push https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git HEAD:main --force
