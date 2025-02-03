@@ -129,7 +129,7 @@ def generate_html(leaderboard):
             <tbody>
     """.format(REPO)
 
-   for rank, contributor in enumerate(leaderboard, start=1):
+for rank, contributor in enumerate(leaderboard, start=1):
     html += """
         <tr>
             <td>{}</td>
