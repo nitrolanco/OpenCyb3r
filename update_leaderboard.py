@@ -129,18 +129,23 @@ def generate_html(leaderboard):
             <tbody>
     """.format(REPO)
 
-    for rank, contributor in enumerate(leaderboard, start=1):
-        html += """
-                <tr>
-                    <td>{}</td>
-                    <td><img src="{}" class="avatar"> {}</td>
-                    <td>{}</td>
-                </tr>
-        """.format(rank, contributor["avatar_url"], contributor["username"], contributor["contributions"])
-
+   for rank, contributor in enumerate(leaderboard, start=1):
     html += """
-            </tbody>
-        </table>
+        <tr>
+            <td>{}</td>
+            <td>
+                <a href="https://github.com/{}" target="_blank" style="color: #00ffea; text-decoration: none;">
+                    <img src="{}" class="avatar"> {}
+                </a>
+            </td>
+            <td>{}</td>
+        </tr>
+    """.format(rank, contributor["username"], contributor["avatar_url"], contributor["username"], contributor["contributions"])
+
+html += """
+        </tbody>
+    </table>
+"""
 
         <script>
             function createParticle() {{
