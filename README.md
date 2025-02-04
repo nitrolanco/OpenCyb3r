@@ -236,9 +236,18 @@ We celebrate our contributors! Earn points for your work and track your progress
 ## Password Analyzer Builder
 Make your own password analyzer with this web tool. Try the Password Analyzer Builder.
 
-Tweak the parameters to test and score passwords the way you choose! 
+Tweak the parameters to test and score passwords the way you choose!
 
 ---
+
+## Hash Generator
+Generate MD5, SHA1, and SHA256 hashes for any iniput string.
+
+Usage Run python hash_generator.py and enter a string to generate its hashes.
+
+---
+
+This tool provides a simple way to generate hashes for cybersecurity and data integrity purposes.
 
 ## Join the Community
 Have questions or need help? Join our growing community by engaging in the repository's discussions or opening an issue to ask for assistance. We welcome contributors of all experience levels.
