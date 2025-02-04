@@ -1,7 +1,8 @@
 #!/usr/bin/python3
-import re
 
 def check_password_strength(password):
+    
+    import re
     strength = 0
     # Length check
     if len(password) >= 12:
@@ -28,19 +29,17 @@ def check_password_strength(password):
 
 
 def run_main():
-    while True:
-        password = input("Enter your password:")
+    password = input("Enter your password:")
     
-        strength = check_password_strength(password)
-        print(f"\nPassword Strength: {strength}/5\n")
-        if strength < 3:
-            print("Your password is weak. Consider making it longer and using a mix of upper and lower case letters, numbers, and special characters.\n")
-        elif strength < 5:
-            print("Your password is moderate. You could improve it by adding more variety.\n")
-        else:
-            print("Your password is strong. Good job!\n")
+    strength = check_password_strength(password)
+    print(f"\nPassword Strength: {strength}/5\n")
+    if strength < 3:
+        print("Your password is weak. Consider making it longer and using a mix of upper and lower case letters, numbers, and special characters.\n")
+    elif strength < 5:
+        print("Your password is moderate. You could improve it by adding more variety.\n")
+    else:
+        print("Your password is strong. Good job!\n")
     
-        print("Enter another password below or press Ctrl+C to exit.\n")
 
 if __name__ == "__main__":
     print("\nWelcome to the OpenCyb3r Password Analyzer!\n")
