@@ -247,6 +247,12 @@ Usage Run python hash_generator.py and enter a string to generate its hashes.
 
 ---
 
+## TOTP Authenticator Module
+A Python-based tool for generating and managing time-based one-time passwords (TOTP) for secure authentication.
+
+It encrypts and securely stores TOTP keys using a master password, allowing users to retrieve time-sensitive OTPs for multiple accounts.
+
+---
 This tool provides a simple way to generate hashes for cybersecurity and data integrity purposes.
 
 ## Join the Community
